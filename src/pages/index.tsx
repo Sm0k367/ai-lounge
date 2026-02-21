@@ -7,17 +7,16 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Handler for session initialization
   function handleInitSession(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (username.trim()) {
       setSessionStarted(true);
 
-      // Play ambient club music on user interaction
+      // Play club audio on session start (user interaction)
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(() => {
-          // Autoplay was blocked—browser will allow after next user gesture
+          // Autoplay may be blocked; plays after next gesture
         });
       }
     }
@@ -33,7 +32,7 @@ export default function Home() {
       {/* Animated club video background */}
       <video
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 animate-fadein"
-        src="/club-bg.mp4"
+        src="/club-bg (2).mp4"
         autoPlay
         loop
         muted
@@ -42,16 +41,17 @@ export default function Home() {
       />
 
       {/* Club music/ambience (plays only after Initialize Session) */}
-      <audio ref={audioRef} src="/club-music.mp3" preload="auto" loop />
+      <audio ref={audioRef} src="/dj_smoke_audio.mp3" preload="auto" loop />
 
-      {/* Glowing overlay */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/50 pointer-events-none z-1" />
 
-      {/* MAIN HERO */}
+      {/* HERO + ENTRY */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-[70vh]">
         <h1 className="glitch-text text-3xl md:text-5xl font-bold mb-4 tracking-[0.3em] animate-glow">
           AI LOUNGE AFTER DARK<br />// NEURAL EDITION
         </h1>
+
         {!sessionStarted ? (
           <form
             className="flex flex-col items-center gap-4 p-6 bg-black/70 rounded-2xl border-2 border-purple-500/40 backdrop-blur-xl"
@@ -88,7 +88,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Optional: Footer or call-to-action bar */}
+      {/* Social/Footer bar */}
       <footer className="absolute bottom-4 w-full flex justify-center gap-6 z-10">
         <a
           href="https://discord.gg/yourclub"
