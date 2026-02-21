@@ -45,3 +45,11 @@ ai-lounge/
 │ └── ...etc
 ├── .env.local
 └── ...
+
+
+## How to Start
+- Add your core video(s) and avatar art to `public/`
+- Main entry: `src/pages/index.tsx` brings together all core components
+- Build new features as self-contained React components in `components/`
+- Keep your vibe consistent: glitch/neon/ultra-real FX in styles/components
+- Want multiplayer? Use Supabase, Ably, or Socket.io for presence
