@@ -9,9 +9,9 @@ export default function SocialExport() {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { mediaSource: 'screen' as any },
+        video: true,
         audio: true
-      });
+      } as any);
       
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'video/webm;codecs=vp9'
