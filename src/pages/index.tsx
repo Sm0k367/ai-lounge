@@ -1,189 +1,103 @@
-import React, { Suspense, useState, useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { PerspectiveCamera, Stars } from '@react-three/drei';
-import Head from 'next/head';
-import ClubScene from '../components/ClubScene';
-import KineticLyrics from '../components/KineticLyrics';
-import AIHost from '../components/AIHost';
-import Crowd from '../components/Crowd';
-import ChatBubbles from '../components/ChatBubbles';
-import SocialExport from '../components/SocialExport';
-import { AudioEngine } from '../lib/audioUtils';
-import { MultiplayerEngine, ChatMessage, User } from '../lib/multiplayer';
-import { EventEngine, AchievementEngine } from '../utils/events';
+import React, { useState, useRef } from "react";
+import Head from "next/head";
 
-export default function AILounge() {
-  const [started, setStarted] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [showNamePrompt, setShowNamePrompt] = useState(true);
-  const [audioEngine, setAudioEngine] = useState<AudioEngine | null>(null);
-  const [multiplayerEngine, setMultiplayerEngine] = useState<MultiplayerEngine | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const eventEngineRef = useRef<EventEngine | null>(null);
-  const achievementEngineRef = useRef<AchievementEngine | null>(null);
-  
-  useEffect(() => {
-    setMounted(true);
-    
-    // Initialize event and achievement engines
-    eventEngineRef.current = new EventEngine();
-    achievementEngineRef.current = new AchievementEngine();
-    
-    // Check first visit achievement
-    achievementEngineRef.current.checkAchievement('first-visit', true);
-    
-    return () => {
-      eventEngineRef.current?.stop();
-    };
-  }, []);
-  
-  const handleStart = async () => {
-    if (!userName.trim()) {
-      alert('Please enter your name!');
-      return;
-    }
-    
-    setShowNamePrompt(false);
-    
-    // Initialize audio engine
-    if (audioRef.current) {
-      const engine = new AudioEngine();
-      await engine.initialize(audioRef.current);
-      setAudioEngine(engine);
-      audioRef.current.play().catch(() => {});
-    }
-    
-    // Initialize multiplayer
-    const mp = new MultiplayerEngine();
-    const userId = await mp.initialize(userName);
-    
-    mp.setOnUserJoined((user) => {
-      setUsers((prev) => [...prev, user]);
-    });
-    
-    mp.setOnUserLeft((userId) => {
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
-    });
-    
-    mp.setOnChatMessage((message) => {
-      setMessages((prev) => [...prev, message]);
-    });
-    
-    setMultiplayerEngine(mp);
-    setUsers(mp.getUsers());
-    
-    // Start event engine
-    eventEngineRef.current?.start();
-    
-    setStarted(true);
-  };
-  
-  const handleSendMessage = (message: string) => {
-    multiplayerEngine?.sendChatMessage(message);
-  };
-  
-  if (!mounted) return null;
-  
+export default function Home() {
+  const [sessionStarted, setSessionStarted] = useState(false);
+  const [username, setUsername] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
   return (
-    <div className="relative w-screen h-screen bg-black overflow-hidden font-['Syncopate']">
+    <div className="relative w-screen h-screen bg-black flex flex-col justify-center items-center overflow-hidden font-['Syncopate']">
       <Head>
-        <title>AI LOUNGE // AFTER DARK</title>
-        <meta name="description" content="The future of digital nightlife - immersive, interactive, revolutionary" />
+        <title>AI LOUNGE AFTER DARK // NEURAL EDITION</title>
+        <meta name="description" content="Enter the digital underground. Club. Create. Connect." />
       </Head>
-      
-      {/* Hidden audio element */}
-      <audio
-        ref={audioRef}
+
+      {/* Animated club video background */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 animate-fadein"
         src="/club-bg.mp4"
+        autoPlay
         loop
-        crossOrigin="anonymous"
-        style={{ display: 'none' }}
+        muted
+        playsInline
+        poster="/club-bg-poster.jpg"
       />
-      
-      {/* 3D Canvas */}
-      <Canvas className="absolute inset-0 z-0">
-        <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[0, 0, 10]} />
-          <Stars radius={100} count={5000} factor={4} fade speed={1} />
-          <ClubScene started={started} audioEngine={audioEngine || undefined} />
-          <Crowd audioEngine={audioEngine || undefined} users={users} />
-          <ambientLight intensity={1.5} />
-          <pointLight position={[10, 10, 10]} intensity={2} color="#8b5cf6" />
-          <pointLight position={[-10, 10, 10]} intensity={2} color="#d946ef" />
-        </Suspense>
-      </Canvas>
-      
-      {/* UI Overlays */}
-      {started && (
-        <>
-          <AIHost audioEngine={audioEngine || undefined} userCount={users.length} />
-          <KineticLyrics audioEngine={audioEngine || undefined} />
-          <ChatBubbles messages={messages} onSendMessage={handleSendMessage} />
-          <SocialExport />
-          
-          {/* Status bar */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-black/80 backdrop-blur-sm px-6 py-2 rounded-full border border-purple-500/30">
-            <div className="text-[8px] text-white/60 tracking-[0.5em] uppercase flex items-center gap-4">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                LIVE
-              </span>
-              <span>{users.length} ONLINE</span>
-              <span>8K NEURAL LINK</span>
+
+      {/* Glowing overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/50 pointer-events-none z-1" />
+
+      {/* MAIN HERO */}
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-[70vh]">
+        <h1 className="glitch-text text-3xl md:text-5xl font-bold mb-4 tracking-[0.3em] animate-glow">
+          AI LOUNGE AFTER DARK<br />// NEURAL EDITION
+        </h1>
+        {!sessionStarted ? (
+          <form
+            className="flex flex-col items-center gap-4 p-6 bg-black/70 rounded-2xl border-2 border-purple-500/40 backdrop-blur-xl"
+            onSubmit={e => {
+              e.preventDefault();
+              if (username.trim()) setSessionStarted(true);
+            }}
+          >
+            <input
+              ref={inputRef}
+              className="w-60 md:w-96 p-3 rounded-lg bg-black/80 border border-purple-800 text-lg text-white text-center neon-glow outline-none focus:ring-2 focus:ring-magenta transition-all"
+              placeholder="ENTER YOUR NAME"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              autoFocus
+              required
+            />
+            <button
+              className="glitch-text mt-2 text-xl px-10 py-3 rounded-lg bg-gradient-to-br from-purple-700 to-pink-600 border border-magenta shadow-lg neon-btn hover:-translate-y-1 hover:bg-pink-800/70 transition-all animate-glow"
+              type="submit"
+            >
+              [ INITIALIZE SESSION ]
+            </button>
+            <div className="text-sm text-white/70 mt-2 space-x-2">
+              <span role="img" aria-label="headphones">🎧</span> Best experienced with headphones
+              <span className="mx-2">|</span>
+              <span role="img" aria-label="devices">📱</span> Mobile & desktop
+              <span className="mx-2">|</span>
+              <span role="img" aria-label="free">🆓</span> 100% free, no signup
             </div>
+          </form>
+        ) : (
+          <div className="flex flex-col items-center gap-4 p-8 bg-black/80 rounded-2xl border-2 border-purple-500/50 animate-glow">
+            <div className="glitch-text text-2xl mb-2">WELCOME, {username.toUpperCase()}!</div>
+            <div className="text-lg text-magenta">Session initialized. The club awaits…</div>
           </div>
-        </>
-      )}
-      
-      {/* Name prompt */}
-      {showNamePrompt && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm">
-          <div className="max-w-md w-full mx-4">
-            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-8 shadow-2xl">
-              <h1 className="glitch-text text-3xl md:text-4xl text-center mb-2">
-                AI LOUNGE
-              </h1>
-              <p className="text-purple-300 text-center text-sm mb-6">
-                AFTER DARK // NEURAL EDITION
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="text-white/80 text-sm font-bold mb-2 block">
-                    ENTER YOUR NAME
-                  </label>
-                  <input
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleStart()}
-                    placeholder="Anonymous"
-                    className="w-full bg-white/10 border border-purple-500/30 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                    maxLength={20}
-                    autoFocus
-                  />
-                </div>
-                
-                <button
-                  onClick={handleStart}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 rounded-lg text-white font-bold text-lg hover:opacity-90 transition-opacity shadow-lg shadow-purple-500/50"
-                >
-                  [ INITIALIZE SESSION ]
-                </button>
-              </div>
-              
-              <div className="mt-6 text-center text-white/40 text-xs space-y-1">
-                <p>🎧 Best experienced with headphones</p>
-                <p>📱 Works on mobile & desktop</p>
-                <p>🆓 100% free, no signup required</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </main>
+
+      {/* Optional: Footer or call-to-action bar */}
+      <footer className="absolute bottom-4 w-full flex justify-center gap-6 z-10">
+        <a
+          href="https://discord.gg/yourclub"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glitch-text text-sm px-4 py-1 rounded-full border border-purple-500 bg-black/70 hover:bg-purple-700/60 transition-all shine"
+        >
+          Join Discord
+        </a>
+        <a
+          href="https://forms.gle/your-open-mic-form"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glitch-text text-sm px-4 py-1 rounded-full border border-pink-500 bg-black/70 hover:bg-pink-700/60 transition-all shine"
+        >
+          Open Mic Signup
+        </a>
+        <a
+          href="https://forms.gle/your-art-form"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glitch-text text-sm px-4 py-1 rounded-full border border-cyan-500 bg-black/70 hover:bg-cyan-700/60 transition-all shine"
+        >
+          Submit Art/Meme
+        </a>
+      </footer>
     </div>
   );
 }
