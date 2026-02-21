@@ -5,6 +5,23 @@ export default function Home() {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [username, setUsername] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Handler for session initialization
+  function handleInitSession(e?: React.FormEvent) {
+    if (e) e.preventDefault();
+    if (username.trim()) {
+      setSessionStarted(true);
+
+      // Play ambient club music on user interaction
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {
+          // Autoplay was blocked—browser will allow after next user gesture
+        });
+      }
+    }
+  }
 
   return (
     <div className="relative w-screen h-screen bg-black flex flex-col justify-center items-center overflow-hidden font-['Syncopate']">
@@ -24,6 +41,9 @@ export default function Home() {
         poster="/club-bg-poster.jpg"
       />
 
+      {/* Club music/ambience (plays only after Initialize Session) */}
+      <audio ref={audioRef} src="/club-music.mp3" preload="auto" loop />
+
       {/* Glowing overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/50 pointer-events-none z-1" />
 
@@ -35,10 +55,7 @@ export default function Home() {
         {!sessionStarted ? (
           <form
             className="flex flex-col items-center gap-4 p-6 bg-black/70 rounded-2xl border-2 border-purple-500/40 backdrop-blur-xl"
-            onSubmit={e => {
-              e.preventDefault();
-              if (username.trim()) setSessionStarted(true);
-            }}
+            onSubmit={handleInitSession}
           >
             <input
               ref={inputRef}
