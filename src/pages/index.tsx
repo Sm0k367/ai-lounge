@@ -25,6 +25,7 @@ export default function Home() {
         <meta name="description" content="Enter the digital underground. Club. Create. Connect." />
       </Head>
 
+      {/* Club video background */}
       <video
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-80 animate-fadein"
         src="/club-bg (2).mp4"
@@ -35,13 +36,13 @@ export default function Home() {
         poster="/club-bg-poster.jpg"
       />
 
+      {/* Club music, plays only after session start */}
       <audio ref={audioRef} src="/dj_smoke_audio.mp3" preload="auto" loop />
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/50 pointer-events-none z-1" />
 
-      {/* HERO + ENTRY */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-2 w-full">
-        <h1 className="glitch-text text-2xl md:text-5xl font-bold mb-4 tracking-[0.15em] animate-glow text-center leading-tight">
+        <h1 className="glitch-text text-2xl sm:text-3xl md:text-5xl font-bold mb-4 tracking-[0.15em] animate-glow text-center leading-tight">
           AI LOUNGE AFTER DARK<br />// NEURAL EDITION
         </h1>
         {!sessionStarted ? (
@@ -57,19 +58,22 @@ export default function Home() {
               onChange={e => setUsername(e.target.value)}
               autoFocus
               required
+              inputMode="text"
+              maxLength={28}
             />
             <button
               className="glitch-text mt-2 text-lg md:text-xl px-6 md:px-10 py-3 rounded-lg bg-gradient-to-br from-purple-700 to-pink-600 border border-magenta shadow-lg neon-btn hover:-translate-y-1 hover:bg-pink-800/70 transition-all animate-glow w-full"
               type="submit"
+              aria-label="Start Session"
             >
               [ INITIALIZE SESSION ]
             </button>
-            <div className="text-xs md:text-sm text-white/70 mt-2 space-x-2 text-center w-full">
+            <div className="text-xs md:text-sm text-white/70 mt-2 space-x-1 text-center w-full">
               <span role="img" aria-label="headphones">🎧</span> Best with headphones
               <span className="mx-1">|</span>
               <span role="img" aria-label="devices">📱</span> Mobile & desktop
               <span className="mx-1">|</span>
-              <span role="img" aria-label="free">🆓</span> 100% free, no signup
+              <span role="img" aria-label="free">🆓</span> 100% free
             </div>
           </form>
         ) : (
@@ -80,7 +84,32 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer/social bar update coming next */}
+      <footer className="absolute bottom-2 left-0 w-full flex flex-wrap justify-center gap-2 md:gap-6 z-10 px-2">
+        <a
+          href="https://discord.gg/yourclub"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glitch-text text-xs md:text-sm px-3 py-1 rounded-full border border-purple-500 bg-black/70 hover:bg-purple-700/60 transition-all shine w-max"
+        >
+          Join Discord
+        </a>
+        <a
+          href="https://forms.gle/your-open-mic-form"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glitch-text text-xs md:text-sm px-3 py-1 rounded-full border border-pink-500 bg-black/70 hover:bg-pink-700/60 transition-all shine w-max"
+        >
+          Open Mic Signup
+        </a>
+        <a
+          href="https://forms.gle/your-art-form"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glitch-text text-xs md:text-sm px-3 py-1 rounded-full border border-cyan-500 bg-black/70 hover:bg-cyan-700/60 transition-all shine w-max"
+        >
+          Submit Art/Meme
+        </a>
+      </footer>
     </div>
   );
 }
