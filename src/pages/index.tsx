@@ -1,52 +1,51 @@
-import React, { Suspense, useState, useEffect, useRef, useMemo } from 'react';
+import React, { Suspense, useState, useEffect, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import gsap from 'gsap';
 import Head from 'next/head';
 
 function ClubScene({ started }: { started: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  
-  // 1. Memoize the video element so it's only created once
-  const video = useMemo(() => {
-    if (typeof window === 'undefined') return null;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [texture, setTexture] = useState<THREE.VideoTexture | null>(null);
+
+  useEffect(() => {
+    // Manual Video Creation - Bypasses React state for speed
     const vid = document.createElement("video");
     vid.src = "/club-bg.mp4";
     vid.loop = true;
     vid.muted = true;
     vid.playsInline = true;
     vid.crossOrigin = "anonymous";
-    return vid;
+    videoRef.current = vid;
+
+    const tex = new THREE.VideoTexture(vid);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    setTexture(tex);
+
+    return () => {
+      vid.pause();
+      vid.src = "";
+      vid.remove();
+    };
   }, []);
 
-  // 2. Create the texture
-  const texture = useMemo(() => {
-    if (!video) return null;
-    const tex = new THREE.VideoTexture(video);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-  }, [video]);
-
-  // 3. THE FRAME PUMP: This forces the texture to update every frame
+  // UseFrame forces the GPU to refresh the video every millisecond
   useFrame(() => {
-    if (started && video && video.readyState >= video.HAVE_CURRENT_DATA) {
-      texture!.needsUpdate = true;
+    if (started && videoRef.current && texture) {
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
+      }
+      texture.needsUpdate = true;
     }
   });
-
-  useEffect(() => {
-    if (started && video) {
-      video.play().catch(e => console.error("Playback failed:", e));
-    }
-  }, [started, video]);
 
   if (!texture) return null;
 
   return (
     <mesh ref={meshRef} scale={[16, 9, 1]}>
       <planeGeometry />
-      <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
   );
 }
@@ -76,7 +75,7 @@ export default function AILounge() {
         </Suspense>
       </Canvas>
 
-      {/* Interface Layer */}
+      {/* Interface */}
       <div className="absolute top-10 left-10 z-10 flex flex-col gap-2 pointer-events-none">
         <div className="glitch-text text-[10px] tracking-[0.5em] text-purple-400">
           SM0K367 // NEURAL_GATEWAY
@@ -86,7 +85,7 @@ export default function AILounge() {
       {!started && (
         <div 
           onClick={() => setStarted(true)}
-          className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 cursor-crosshair transition-all"
+          className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 cursor-pointer"
         >
           <div className="glitch-text text-xl border border-purple-500/30 p-12 hover:bg-purple-500/10 hover:border-purple-500 transition-all">
             [ INITIALIZE_SESSION ]
@@ -95,10 +94,8 @@ export default function AILounge() {
       )}
 
       {started && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-          <h1 className="glitch-text text-4xl md:text-6xl font-bold text-center opacity-80">
-            SYSTEM_ACTIVE
-          </h1>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 text-[7px] text-white/40 tracking-[1em] uppercase">
+          STREAMING_8K_NEURAL_LINK
         </div>
       )}
     </div>
